@@ -18,7 +18,7 @@ func StartServer() {
 	auth.PrintConfig()
 	s := jch_http.NewServer(negroni.New()).
 		Static("/public/*filepath", http.Dir("public/")).
-		Service("", auth.Service(auth.FromEnv())).
+		Service("", auth.Service(auth.FromEnv(nil))).
 		GET("/", "", http.HandlerFunc(HomeHandler))
 
 	port := os.Getenv("PORT")
