@@ -25,9 +25,9 @@ func NewAuthenticator(domain, clientID, clientSecret, callback string) (*Authent
 	}
 
 	conf := oauth2.Config{
-		ClientID:     "ae1e02bTwXA35O3r3Xxk4kbRf31j5ge9",
-		ClientSecret: "NFC5KYeM9GA2z0ptvzKPo9jmkQDRjx_WcsWyK0hzOJmr1CykS9cEmTcNh0-hKiMd",
-		RedirectURL:  "http://localhost:3000/callback",
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+		RedirectURL:  callback,
 		Endpoint:     provider.Endpoint(),
 		Scopes:       []string{oidc.ScopeOpenID, "profile"},
 	}
