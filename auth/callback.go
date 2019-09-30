@@ -54,8 +54,6 @@ func NewCallbackHandler(c Config) http.HandlerFunc {
 
 		// Getting now the userInfo
 		user := User{}
-
-		// var profile map[string]interface{}
 		if err := idToken.Claims(&user); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -80,12 +78,12 @@ func NewCallbackHandler(c Config) http.HandlerFunc {
 		//    - by email address domain?
 		//set tenant ID on application ID in App Metadata on user
 
-		if c.CallbackFunc != nil {
-			c.CallbackFunc(c, user)
-		} else {
-			// Redirect to logged in page
-			http.Redirect(w, r, "/user", http.StatusSeeOther)
-		}
+		// if c.CallbackFunc != nil {
+		// 	c.CallbackFunc(c, user)
+		// } else {
+		// Redirect to logged in page
+		http.Redirect(w, r, c.RedirectURL, http.StatusSeeOther)
+		// }
 
 	}
 }

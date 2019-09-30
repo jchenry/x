@@ -10,21 +10,21 @@ type Config struct {
 	ClientID     string
 	ClientSecret string
 	CallbackURL  string
-	CallbackFunc CallbackFunc
+	RedirectURL  string
 }
 
-func FromEnv(c CallbackFunc) Config {
+func FromEnv() Config {
 	return Config{
 		Domain:       os.Getenv("AUTH_DOMAIN"),
 		ClientID:     os.Getenv("AUTH_CLIENT_ID"),
 		ClientSecret: os.Getenv("AUTH_CLIENT_SECRET"),
 		CallbackURL:  os.Getenv("AUTH_CALLBACK_URL"),
-		CallbackFunc: c,
+		RedirectURL:  "/user",
 	}
 }
 
 func PrintConfig() {
-	fmt.Printf("%#v\n", FromEnv(nil))
+	fmt.Printf("%#v\n", FromEnv())
 }
 
 type CallbackFunc func(c Config, u User) error
