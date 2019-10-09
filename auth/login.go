@@ -19,7 +19,7 @@ func NewLoginHandler(c Config) http.HandlerFunc {
 		}
 		state := base64.StdEncoding.EncodeToString(b)
 
-		session, err := Store.Get(r, "auth-session")
+		session, err := Store.Get(r, SessionName)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

@@ -9,7 +9,7 @@ import (
 func HasTenantAndSubscription(productID string) func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	return func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
-		session, err := auth.Store.Get(r, "auth-session")
+		session, err := auth.Store.Get(r, auth.SessionName)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -17,7 +17,7 @@ func HasTenantAndSubscription(productID string) func(w http.ResponseWriter, r *h
 
 		if u, ok := session.Values["profile"]; ok {
 			user := u.(auth.User)
-			if _, exist := user.AppMetadata.Apps[productID]; !exist {
+			if _, exist := user.Apps[productID]; exist {
 				next(w, r)
 			} else {
 				http.Redirect(w, r, "/subscription", http.StatusSeeOther)

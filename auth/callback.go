@@ -11,7 +11,7 @@ import (
 func NewCallbackHandler(c Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		session, err := Store.Get(r, "auth-session")
+		session, err := Store.Get(r, SessionName)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

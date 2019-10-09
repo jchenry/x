@@ -5,6 +5,7 @@ import (
 
 	"github.com/codegangsta/negroni"
 	jch_http "github.com/jchenry/jchenry/http"
+	"gopkg.in/auth0.v1/management"
 )
 
 func Service(c Config) ServiceInstance {
@@ -24,4 +25,16 @@ func (si ServiceInstance) Register(uriBase string, s *jch_http.Server) {
 		negroni.HandlerFunc(IsAuthenticated),
 		negroni.Wrap(http.HandlerFunc(UserHandler)),
 	))
+}
+
+func (si ServiceInstance) UpdateUser(u User) error {
+
+	m, err := management.New(si.c.Domain, si.c.ManagementClientID, si.c.ManagementClientSecret)
+	if err != nil {
+		return err
+	}
+
+	um := management.NewUserManager(m)
+
+	return um.Update(u.ID, &management.User{AppMetadata: u.Apps})
 }

@@ -8,7 +8,7 @@ import (
 
 func UserHandler(w http.ResponseWriter, r *http.Request) {
 
-	session, err := Store.Get(r, "auth-session")
+	session, err := Store.Get(r, SessionName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -18,22 +18,15 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type User struct {
-	Email       string      `json:"email"`
-	FirstName   string      `json:"given_name"`
-	LastName    string      `json:"family_name"`
-	Picture     string      `json:"picture"`
-	Nickname    string      `json:"nickname"`
-	AppMetadata AppMetadata `json:"app_metadata"`
+	ID        string                 `json:"sub"`
+	Email     string                 `json:"email"`
+	FirstName string                 `json:"given_name"`
+	LastName  string                 `json:"family_name"`
+	Picture   string                 `json:"picture"`
+	Nickname  string                 `json:"nickname"`
+	Apps      map[string]interface{} `json:"app_metadata,omitempty"`
 
 	//UserMetadata UserMetadata `json:"user_metadata"`
-}
-
-type AppMetadata struct {
-	Apps map[string]string // an association between the unique applicationID and the tenantID that the user is associated with
-	// Apps []struct {
-	// 	ApplicationID string
-	// 	TenantID      string
-	// }
 }
 
 // type UserMetadata struct {

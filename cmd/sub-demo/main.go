@@ -18,10 +18,12 @@ func main() {
 func StartServer() {
 	auth.PrintConfig()
 	payments.PrintConfig()
+
+	auth_service := auth.Service(auth.FromEnv())
 	s := jch_http.NewServer(negroni.New()).
 		Static("/public/*filepath", http.Dir("public/")).
-		Service("", auth.Service(auth.FromEnv())).
-		Service("", payments.Service(payments.FromEnv())).
+		Service("", auth_service).
+		Service("", payments.Service(payments.FromEnv(), &auth_service)).
 		GET("/", "", http.HandlerFunc(HomeHandler))
 
 	port := os.Getenv("PORT")
