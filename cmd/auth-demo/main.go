@@ -16,7 +16,7 @@ func main() {
 
 func StartServer() {
 	auth.PrintConfig()
-	s := jch_http.NewServer(negroni.New()).
+	s := jch_http.NewServer(negroni.New(), jch_http.NewRouter()).
 		Static("/public/*filepath", http.Dir("public/")).
 		Service("", auth.Service(auth.FromEnv())).
 		GET("/", "", http.HandlerFunc(HomeHandler))

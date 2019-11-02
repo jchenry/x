@@ -20,7 +20,7 @@ func StartServer() {
 	payments.PrintConfig()
 
 	auth_service := auth.Service(auth.FromEnv())
-	s := jch_http.NewServer(negroni.New()).
+	s := jch_http.NewServer(negroni.New(), jch_http.NewRouter()).
 		Static("/public/*filepath", http.Dir("public/")).
 		Service("", auth_service).
 		Service("", payments.Service(payments.FromEnv(), &auth_service)).

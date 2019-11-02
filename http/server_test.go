@@ -3,6 +3,7 @@ package http_test
 import (
 	"os"
 
+	"github.com/codegangsta/negroni"
 	"github.com/jchenry/jchenry/http"
 	"github.com/jchenry/jchenry/rest"
 )
@@ -15,8 +16,14 @@ func ExampleServer() {
 		Email string `json:"emailAddress"`
 	}
 
-	s := http.NewServer().
-		Service("", rest.Collection(new(contact), crud.NewInMemoryCrudService()))
+	s := http.NewServer(
+		negroni.Classic(),
+		http.NewJulienschmidtHTTPRouter()).
+		Service("",
+			rest.Collection(new(contact),
+				nil, //crud.NewInMemoryCrudService(),
+			),
+		)
 
 	port := os.Getenv("PORT")
 	if port == "" {
