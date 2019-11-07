@@ -18,17 +18,16 @@ type ServiceInstance struct {
 
 func (si ServiceInstance) Register(uriBase string, s *jch_http.Server) {
 
-	s.GET(uriBase+"/login", "login endpoint", http.HandlerFunc(NewLoginHandler(si.c)))
-	s.GET(uriBase+"/logout", "logout endpoint", http.HandlerFunc(LogoutHandler))
-	s.GET(uriBase+"/callback", "oidc callback", http.HandlerFunc(NewCallbackHandler(si.c)))
-	s.GET(uriBase+"/user", "user info endpoint", negroni.New(
+	s.Get(uriBase+"/login", "login endpoint", http.HandlerFunc(NewLoginHandler(si.c)))
+	s.Get(uriBase+"/logout", "logout endpoint", http.HandlerFunc(LogoutHandler))
+	s.Get(uriBase+"/callback", "oidc callback", http.HandlerFunc(NewCallbackHandler(si.c)))
+	s.Get(uriBase+"/user", "user info endpoint", negroni.New(
 		negroni.HandlerFunc(IsAuthenticated),
 		negroni.Wrap(http.HandlerFunc(UserHandler)),
 	))
 }
 
 func (si ServiceInstance) UpdateUser(u User) error {
-
 	m, err := management.New(si.c.Domain, si.c.ManagementClientID, si.c.ManagementClientSecret)
 	if err != nil {
 		return err

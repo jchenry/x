@@ -33,10 +33,10 @@ type ServiceInstance struct {
 }
 
 func (si ServiceInstance) Register(uriBase string, s *jch_http.Server) {
-	s.GET(uriBase+"/subscription", "subscription info endpoint", negroni.New(
+	s.Get(uriBase+"/subscription", "subscription info endpoint", negroni.New(
 		negroni.HandlerFunc(auth.IsAuthenticated),
 		negroni.Wrap(http.HandlerFunc(si.subscriptionHandler)),
-	)).POST(uriBase+"/subscription", "subscription payment endpoint", negroni.New(
+	)).Post(uriBase+"/subscription", "subscription payment endpoint", negroni.New(
 		negroni.HandlerFunc(auth.IsAuthenticated),
 		negroni.Wrap(http.HandlerFunc(si.paymentHandler)),
 	))

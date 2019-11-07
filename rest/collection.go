@@ -53,11 +53,11 @@ func (collection *CollectionInstance) Register(uriBase string, restServer *jch_h
 
 	urlBase := uriBase + "/" + plural //collection.name + "s"
 	restServer.
-		POST(urlBase, "create a "+collection.name, http.HandlerFunc(collection.create)).
-		PUT(urlBase+"/:"+IDPathParameter, "update a "+collection.name, http.HandlerFunc(collection.update)).
-		DELETE(urlBase+"/:"+IDPathParameter, "delete a "+collection.name, http.HandlerFunc(collection.remove)).
-		GET(urlBase+"/:"+IDPathParameter, "get a "+collection.name+" by id", http.HandlerFunc(collection.find)).
-		GET(urlBase, "get "+collection.name+"s", http.HandlerFunc(collection.find))
+		Post(urlBase, "create a "+collection.name, http.HandlerFunc(collection.create)).
+		Put(urlBase+"/:"+IDPathParameter, "update a "+collection.name, http.HandlerFunc(collection.update)).
+		Delete(urlBase+"/:"+IDPathParameter, "delete a "+collection.name, http.HandlerFunc(collection.remove)).
+		Get(urlBase+"/:"+IDPathParameter, "get a "+collection.name+" by id", http.HandlerFunc(collection.find)).
+		Get(urlBase, "get "+collection.name+"s", http.HandlerFunc(collection.find))
 }
 
 func properPlural(word string) string {

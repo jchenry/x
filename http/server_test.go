@@ -21,7 +21,7 @@ func ExampleServer() {
 		http.NewJulienschmidtHTTPRouter()).
 		Service("",
 			rest.Collection(new(contact),
-				nil, //crud.NewInMemoryCrudService(),
+				nil,
 			),
 		)
 

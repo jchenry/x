@@ -15,7 +15,6 @@ type Router interface {
 	go_http.Handler
 	ServeFiles(path string, root go_http.FileSystem)
 	AddHandler(method, path string, handler go_http.Handler)
-	// ServeHTTP(w http.ResponseWriter, req *http.Request)
 }
 
 type Service interface {
@@ -31,14 +30,13 @@ func (f ServiceFunc) Register(uriBase string, restServer *Server) {
 var docString = "%s  \t%s\t- %s"
 
 type Server struct {
-	//router     *httprouter.Router
 	router     Router
 	middleware Middleware
 }
 
 func NewServer(m Middleware, r Router) *Server {
 	s := &Server{
-		router:     r, //httprouter.New(),
+		router:     r,
 		middleware: m,
 	}
 
@@ -47,26 +45,26 @@ func NewServer(m Middleware, r Router) *Server {
 	return s
 }
 
-func (r *Server) GET(path string, documentation string, handle go_http.Handler) *Server {
+func (r *Server) Get(path string, documentation string, handle go_http.Handler) *Server {
 	r.handle("GET", path, documentation, handle)
 	return r
 }
-func (r *Server) PATCH(path string, documentation string, handle go_http.Handler) *Server {
+func (r *Server) Patch(path string, documentation string, handle go_http.Handler) *Server {
 	r.handle("PATCH", path, documentation, handle)
 
 	return r
 }
-func (r *Server) POST(path string, documentation string, handle go_http.Handler) *Server {
+func (r *Server) Post(path string, documentation string, handle go_http.Handler) *Server {
 	r.handle("POST", path, documentation, handle)
 
 	return r
 }
-func (r *Server) PUT(path string, documentation string, handle go_http.Handler) *Server {
+func (r *Server) Put(path string, documentation string, handle go_http.Handler) *Server {
 	r.handle("PUT", path, documentation, handle)
 
 	return r
 }
-func (r *Server) DELETE(path string, documentation string, handle go_http.Handler) *Server {
+func (r *Server) Delete(path string, documentation string, handle go_http.Handler) *Server {
 	r.handle("DELETE", path, documentation, handle)
 
 	return r
@@ -74,15 +72,6 @@ func (r *Server) DELETE(path string, documentation string, handle go_http.Handle
 func (r *Server) handle(method, path string, documentation string, handler go_http.Handler) {
 	log.Printf(docString, method, path, documentation)
 	r.router.AddHandler(method, path, handler)
-	// r.router.Handle(method, path, func(w http.ResponseWriter, req *http.Request, params httprouter.Params) {
-	// 	if req.Form == nil {
-	// 		req.Form = url.Values{}
-	// 	}
-	// 	for _, param := range params { // stuffing values back into request.Form to honor the handler contract
-	// 		req.Form.Add(param.Key, param.Value)
-	// 	}
-	// 	handler.ServeHTTP(w, req)
-	// })
 }
 
 func (r *Server) Banner(banner string) *Server {
