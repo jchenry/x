@@ -20,11 +20,11 @@ func StartServer() {
 	payments.PrintConfig()
 
 	auth_service := auth.Service(auth.FromEnv())
-	s := jch_http.NewServer(negroni.New(), jch_http.NewRouter()).
+	s := jch_http.NewServer(negroni.New(), jch_http.NewJulienschmidtHTTPRouter()).
 		Static("/public/*filepath", http.Dir("public/")).
 		Service("", auth_service).
 		Service("", payments.Service(payments.FromEnv(), &auth_service)).
-		GET("/", "", http.HandlerFunc(HomeHandler))
+		Get("/", "", http.HandlerFunc(HomeHandler))
 
 	port := os.Getenv("PORT")
 	if port == "" {

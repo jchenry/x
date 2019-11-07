@@ -16,10 +16,10 @@ func main() {
 
 func StartServer() {
 	auth.PrintConfig()
-	s := jch_http.NewServer(negroni.New(), jch_http.NewRouter()).
+	s := jch_http.NewServer(negroni.New(), jch_http.NewJulienschmidtHTTPRouter()).
 		Static("/public/*filepath", http.Dir("public/")).
 		Service("", auth.Service(auth.FromEnv())).
-		GET("/", "", http.HandlerFunc(HomeHandler))
+		Get("/", "", http.HandlerFunc(HomeHandler))
 
 	port := os.Getenv("PORT")
 	if port == "" {
