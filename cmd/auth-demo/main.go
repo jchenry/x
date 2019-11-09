@@ -6,7 +6,7 @@ import (
 
 	"github.com/codegangsta/negroni"
 	"github.com/jchenry/jchenry/auth"
-	jch_http "github.com/jchenry/jchenry/http"
+	_http "github.com/jchenry/jchenry/http"
 )
 
 func main() {
@@ -16,7 +16,7 @@ func main() {
 
 func StartServer() {
 	auth.PrintConfig()
-	s := jch_http.NewServer(negroni.New(), jch_http.NewJulienschmidtHTTPRouter()).
+	s := _http.NewServer(negroni.New(), _http.NewJulienschmidtHTTPRouter()).
 		Static("/public/*filepath", http.Dir("public/")).
 		Service("", auth.Service(auth.FromEnv())).
 		Get("/", "", http.HandlerFunc(HomeHandler))
@@ -30,5 +30,5 @@ func StartServer() {
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	jch_http.RenderTemplate(w, "home", nil)
+	_http.RenderTemplate(w, "home", nil)
 }

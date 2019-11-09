@@ -6,7 +6,7 @@ import (
 
 	"github.com/codegangsta/negroni"
 	"github.com/jchenry/jchenry/auth"
-	jch_http "github.com/jchenry/jchenry/http"
+	_http "github.com/jchenry/jchenry/http"
 	"github.com/stripe/stripe-go"
 	"github.com/stripe/stripe-go/client"
 	"github.com/stripe/stripe-go/customer"
@@ -32,7 +32,7 @@ type ServiceInstance struct {
 	auth   *auth.ServiceInstance
 }
 
-func (si ServiceInstance) Register(uriBase string, s *jch_http.Server) {
+func (si ServiceInstance) Register(uriBase string, s *_http.Server) {
 	s.Get(uriBase+"/subscription", "subscription info endpoint", negroni.New(
 		negroni.HandlerFunc(auth.IsAuthenticated),
 		negroni.Wrap(http.HandlerFunc(si.subscriptionHandler)),
@@ -56,7 +56,7 @@ func (si ServiceInstance) subscriptionHandler(w http.ResponseWriter, r *http.Req
 	for it.Next() {
 		plans = append(plans, *it.Plan())
 	}
-	jch_http.RenderTemplate(w, "subscription", offering{Product: *prod, Plans: plans})
+	_http.RenderTemplate(w, "subscription", offering{Product: *prod, Plans: plans})
 }
 
 type offering struct {

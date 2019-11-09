@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/codegangsta/negroni"
-	jch_http "github.com/jchenry/jchenry/http"
+	_http "github.com/jchenry/jchenry/http"
 	"gopkg.in/auth0.v1/management"
 )
 
@@ -16,7 +16,7 @@ type ServiceInstance struct {
 	c Config
 }
 
-func (si ServiceInstance) Register(uriBase string, s *jch_http.Server) {
+func (si ServiceInstance) Register(uriBase string, s *_http.Server) {
 
 	s.Get(uriBase+"/login", "login endpoint", http.HandlerFunc(NewLoginHandler(si.c)))
 	s.Get(uriBase+"/logout", "logout endpoint", http.HandlerFunc(LogoutHandler))

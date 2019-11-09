@@ -6,7 +6,7 @@ import (
 
 	"github.com/codegangsta/negroni"
 	"github.com/jchenry/jchenry/auth"
-	jch_http "github.com/jchenry/jchenry/http"
+	_http "github.com/jchenry/jchenry/http"
 	"github.com/jchenry/jchenry/payments"
 )
 
@@ -20,7 +20,7 @@ func StartServer() {
 	payments.PrintConfig()
 
 	auth_service := auth.Service(auth.FromEnv())
-	s := jch_http.NewServer(negroni.New(), jch_http.NewJulienschmidtHTTPRouter()).
+	s := _http.NewServer(negroni.New(), _http.NewJulienschmidtHTTPRouter()).
 		Static("/public/*filepath", http.Dir("public/")).
 		Service("", auth_service).
 		Service("", payments.Service(payments.FromEnv(), &auth_service)).
