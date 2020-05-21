@@ -35,5 +35,5 @@ func StartServer() {
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	jch_http.RenderTemplate(w, "home", nil)
+	_http.RenderTemplate(w, "home", nil)
 }

@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	jch_http "github.com/jchenry/jchenry/http"
+	_http "github.com/jchenry/jchenry/http"
 )
 
 const (
@@ -48,7 +48,7 @@ func Collection(entityPtr interface{}, service CollectionStore) *CollectionInsta
 	}
 }
 
-func (collection *CollectionInstance) Register(uriBase string, restServer *jch_http.Server) {
+func (collection *CollectionInstance) Register(uriBase string, restServer *_http.Server) {
 	plural := properPlural(collection.name)
 
 	urlBase := uriBase + "/" + plural //collection.name + "s"
@@ -73,77 +73,77 @@ func properPlural(word string) string {
 func (collection *CollectionInstance) create(response http.ResponseWriter, request *http.Request) {
 	entityPtr := reflect.New(collection.instanceType).Interface() //collection.instanceProviderPtr.NewInstance()
 
-	err := jch_http.ReadEntity(request, entityPtr)
+	err := _http.ReadEntity(request, entityPtr)
 	if err != nil {
-		jch_http.WriteErrorResponse(response, http.StatusBadRequest, err.Error())
+		_http.WriteErrorResponse(response, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	err = collection.service.Create(entityPtr)
 	if err != nil {
-		jch_http.WriteErrorResponse(response, http.StatusInternalServerError, err.Error())
+		_http.WriteErrorResponse(response, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	response.WriteHeader(http.StatusCreated)
-	jch_http.WriteEntity(response, entityPtr)
+	_http.WriteEntity(response, entityPtr)
 }
 
 func (collection *CollectionInstance) update(response http.ResponseWriter, request *http.Request) {
 	entityPtr := reflect.New(collection.instanceType).Interface() //collection.instanceProviderPtr.NewInstance()
-	err := jch_http.ReadEntity(request, entityPtr)
+	err := _http.ReadEntity(request, entityPtr)
 
 	if err != nil {
-		jch_http.WriteErrorResponse(response, http.StatusBadRequest, err.Error())
+		_http.WriteErrorResponse(response, http.StatusBadRequest, err.Error())
 		return
 	}
 	id := request.Form.Get(IDPathParameter)
 	err = collection.service.Find(&[]interface{}{}, map[string]interface{}{IDPathParameter: id})
 
 	if err != nil {
-		if err == jch_http.ErrNotFound {
-			jch_http.WriteErrorResponse(response, http.StatusNotFound, fmt.Sprintf("%v with id %v not found", collection.name, id))
+		if err == _http.ErrNotFound {
+			_http.WriteErrorResponse(response, http.StatusNotFound, fmt.Sprintf("%v with id %v not found", collection.name, id))
 		} else {
-			jch_http.WriteErrorResponse(response, http.StatusInternalServerError, err.Error())
+			_http.WriteErrorResponse(response, http.StatusInternalServerError, err.Error())
 		}
 		return
 	}
 	err = collection.service.Update(entityPtr)
 	if err != nil {
-		jch_http.WriteErrorResponse(response, http.StatusInternalServerError, err.Error())
+		_http.WriteErrorResponse(response, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	response.WriteHeader(http.StatusOK)
-	jch_http.WriteEntity(response, entityPtr)
+	_http.WriteEntity(response, entityPtr)
 }
 
 func (collection *CollectionInstance) remove(response http.ResponseWriter, request *http.Request) {
 	id := request.Form.Get(IDPathParameter)
 	err := collection.service.Find(&[]interface{}{}, map[string]interface{}{IDPathParameter: id})
 	if err != nil {
-		if err == jch_http.ErrNotFound {
-			jch_http.WriteErrorResponse(response, http.StatusNotFound, fmt.Sprintf("%v with id %v not found", collection.name, id))
+		if err == _http.ErrNotFound {
+			_http.WriteErrorResponse(response, http.StatusNotFound, fmt.Sprintf("%v with id %v not found", collection.name, id))
 		} else {
-			jch_http.WriteErrorResponse(response, http.StatusInternalServerError, err.Error())
+			_http.WriteErrorResponse(response, http.StatusInternalServerError, err.Error())
 		}
 		return
 	}
 	entityPtr := reflect.New(collection.instanceType).Interface() //collection.instanceProviderPtr.NewInstance()
 	field := reflect.Indirect(reflect.ValueOf(entityPtr)).FieldByName(strings.ToUpper(IDPathParameter))
 	if !field.CanSet() {
-		jch_http.WriteErrorResponse(response, http.StatusInternalServerError, "entity does not have "+IDPathParameter+" field or field is not setable")
+		_http.WriteErrorResponse(response, http.StatusInternalServerError, "entity does not have "+IDPathParameter+" field or field is not setable")
 	}
 	parsedID, err := strconv.ParseInt(id, 0, 64)
 	if err != nil {
-		jch_http.WriteErrorResponse(response, http.StatusInternalServerError, err.Error())
+		_http.WriteErrorResponse(response, http.StatusInternalServerError, err.Error())
 
 	}
 	field.SetInt(parsedID)
 
 	err = collection.service.Delete(entityPtr)
 	if err != nil {
-		jch_http.WriteErrorResponse(response, http.StatusInternalServerError, err.Error())
+		_http.WriteErrorResponse(response, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -157,10 +157,10 @@ func (collection *CollectionInstance) find(response http.ResponseWriter, request
 	err := collection.service.Find(arri, valuesToMap(request.URL.Query(), id))
 
 	if err != nil {
-		if err == jch_http.ErrNotFound {
-			jch_http.WriteErrorResponse(response, http.StatusNotFound, fmt.Sprintf("%v with id %v not found", collection.name, id))
+		if err == _http.ErrNotFound {
+			_http.WriteErrorResponse(response, http.StatusNotFound, fmt.Sprintf("%v with id %v not found", collection.name, id))
 		} else {
-			jch_http.WriteErrorResponse(response, http.StatusInternalServerError, err.Error())
+			_http.WriteErrorResponse(response, http.StatusInternalServerError, err.Error())
 		}
 		return
 	}
@@ -183,7 +183,7 @@ func (collection *CollectionInstance) find(response http.ResponseWriter, request
 	}
 
 	response.WriteHeader(http.StatusOK)
-	jch_http.WriteEntity(response, results)
+	_http.WriteEntity(response, results)
 }
 
 func valuesToMap(params map[string][]string, id string) map[string]interface{} {

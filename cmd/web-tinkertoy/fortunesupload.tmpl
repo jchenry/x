@@ -1,0 +1,15 @@
+<html>
+<body>
+
+{{if (eq .Message "")}}
+    <form
+      enctype="multipart/form-data"
+      method="post">
+      <input type="file" name="fortunes" />
+      <input type="submit" value="upload" />
+    </form>
+{{else}}
+    {{.Message}}
+{{end}}
+</body>
+</html>

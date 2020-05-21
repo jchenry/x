@@ -1,0 +1,15 @@
+<html>
+<body>
+
+{{if (eq .Message "")}}
+    <form action="/echo" method="post">
+        <input type="text" id="msg" name="msg">
+        <input type="submit" value="Submit">
+    </form>
+{{else}}
+
+    {{.Message}}
+
+{{end}}
+</body>
+</html>

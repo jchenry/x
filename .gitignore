@@ -1,3 +1,5 @@
 cmd/sub-demo/sub-demo
 cmd/auth-demo/auth-demo
 .vscode/
+**/.DS_Store
+
