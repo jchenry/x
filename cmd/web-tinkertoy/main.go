@@ -18,16 +18,6 @@ func main() {
 }
 
 func run(args []string, stdout io.Writer) error {
-	// ctx, cancel := context.WithCancel(context.Background())
-	// defer cancel()
-	// if db, err := sql.Open("sqlite3", "foo.db"); err == nil {
-	// 	dba := DBActor{
-	// 		DB:         db,
-	// 		ActionChan: make(chan DBFunc, 1),
-	// 	}
-	// 	go dba.Run(ctx)
-	// }
-
 	s := server{
 		router: http.NewServeMux(),
 	}
