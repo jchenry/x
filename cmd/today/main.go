@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jchenry/libs/arvelie"
+	"github.com/jchenry/jchenry/arvelie"
 )
 
 func main() {
