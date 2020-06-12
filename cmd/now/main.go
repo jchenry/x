@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jchenry/jchenry/neralie"
+	"github.com/jchenry/jchenry/pkg/neralie"
 )
 
 func main() {

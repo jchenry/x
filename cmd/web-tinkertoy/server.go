@@ -15,5 +15,4 @@ func (s *server) routes() {
 	s.router.HandleFunc("/time", s.handleTime())
 	s.router.HandleFunc("/echo", s.handleEcho())
 	s.router.HandleFunc("/fortune", s.handleFortune())
-
 }

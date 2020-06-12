@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/codegangsta/negroni"
-	"github.com/jchenry/jchenry/auth"
-	_http "github.com/jchenry/jchenry/http"
+	"github.com/jchenry/jchenry/internal/auth"
+	_http "github.com/jchenry/jchenry/internal/http"
 )
 
 func main() {
