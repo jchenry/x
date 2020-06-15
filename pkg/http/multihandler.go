@@ -26,6 +26,11 @@ func MutliHandler(h map[string]http.Handler) (http.HandlerFunc, error) {
 		}
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		h[r.Method].ServeHTTP(w, r)
+		if hdlr, ok := h[r.Method]; ok {
+			hdlr.ServeHTTP(w, r)
+		} else {
+			NotFoundHandler.ServeHTTP(w, r)
+		}
+
 	}, nil
 }
