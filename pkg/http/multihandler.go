@@ -10,6 +10,7 @@ import (
 // based on a request's method
 func MutliHandler(h map[string]http.Handler) (http.HandlerFunc, error) {
 	m := map[string]bool{
+		http.MethodGet:     true,
 		http.MethodHead:    true,
 		http.MethodPost:    true,
 		http.MethodPut:     true,
