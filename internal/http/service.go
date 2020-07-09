@@ -26,3 +26,13 @@ package http
 //     MethodConnect = "CONNECT"
 //     MethodOptions = "OPTIONS"
 //     MethodTrace   = "TRACE"
+
+type Service interface {
+	Register(m *Mux) error
+}
+
+type ServiceFunc func(m *Mux) error
+
+func (s ServiceFunc) Register(m *Mux) error {
+	return s(m)
+}

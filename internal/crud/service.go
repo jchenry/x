@@ -1,8 +1,6 @@
 package crud
 
-import (
-	"github.com/jchenry/jchenry/pkg/db"
-)
+import "github.com/jchenry/jchenry/pkg/db"
 
 type Service interface {
 	// Find returns a pointer to an array of the results found based on params
