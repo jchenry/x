@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func BasicAuth(fn http.HandlerFunc) http.HandlerFunc {
+func BasicAuth(h http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user, pass, _ := r.BasicAuth()
 		if !(user == os.Getenv("WIKI_USERNAME") && pass == os.Getenv("WIKI_PASSWORD")) {
@@ -13,6 +13,7 @@ func BasicAuth(fn http.HandlerFunc) http.HandlerFunc {
 			http.Error(w, "Unauthorized.", 401)
 			return
 		}
-		fn(w, r)
+
+		h.ServeHTTP(w, r)
 	}
 }
