@@ -10,32 +10,23 @@ import (
 	"github.com/jchenry/x/log"
 )
 
-type CollectionStore interface {
-	All(params map[string][]string) (interface{}, error)
-	Get(id string) (interface{}, error)
-	Delete(id string) error
-	Update(e interface{}) error
-	New(e interface{}) error
-}
-
-// Example: Collection(p, c, JSONEncoder, json.Decode(func()interface{}{return &foo{}}), log.None{})
-func Collection(pool *sync.Pool, store CollectionStore, encode EntityEncoder, decode encoding.Decoder, log log.Logger) http.HandlerFunc {
-	return EntityHandler(
-		collectionGet(store, encode, log),
-		collectionPost(store, encode, decode, pool, log),
-		collectionPut(store, encode, decode, pool, log),
-		collectionDelete(store, encode, log),
+// Example: Resource(p, c, JSONEncoder, json.Decode(func()interface{}{return &foo{}}), log.None{})
+func Resource(p *sync.Pool, g Gateway, e EntityEncoder, d encoding.Decoder, l log.Logger) http.HandlerFunc {
+	return restVerbHandler(
+		GetResource(g, e, l),
+		PostResource(g, d, p, l),
+		PutResource(g, e, d, p, l),
+		DeleteResource(g, l),
 	)
 }
 
-func collectionGet(store CollectionStore, encode EntityEncoder, log log.Logger) http.HandlerFunc {
+func GetResource(store Readable, encode EntityEncoder, log log.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) { // GET
 		if id := filepath.Base(r.URL.Path); id != "" {
-			if e, err := store.Get(id); err == nil { // handle individual entity
+			if e, err := store.Read(id); err == nil { // handle individual entity
 				encode(w, e)
 			} else {
 				w.WriteHeader(http.StatusInternalServerError)
-				encode(w, err)
 				log.Printf("Error: %s", err)
 			}
 		} else {
@@ -43,25 +34,22 @@ func collectionGet(store CollectionStore, encode EntityEncoder, log log.Logger) 
 				if e, err := store.All(params); err == nil { // handle all entities
 					encode(w, e)
 				} else {
-					// TODO: we really should write a header here, but need to figure out what it should be
 					w.WriteHeader(http.StatusInternalServerError)
 					log.Printf("Error: %s", err)
 				}
 			} else {
-				//	encode(w, err)
 				w.WriteHeader(http.StatusBadRequest)
-
 			}
 		}
 	}
 }
 
-func collectionPost(store CollectionStore, encode EntityEncoder, decode encoding.Decoder, pool *sync.Pool, log log.Logger) http.HandlerFunc {
+func PostResource(store Creatable, decode encoding.Decoder, pool *sync.Pool, log log.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) { // POST TODO
-		e := pool.New()
+		e := pool.Get()
 		defer pool.Put(e)
 		if err := decode(r.Body, e); err == nil {
-			if err = store.New(e); err == nil {
+			if err = store.Create(e); err == nil {
 				w.WriteHeader(http.StatusCreated)
 			} else {
 				w.WriteHeader(http.StatusInternalServerError)
@@ -73,9 +61,9 @@ func collectionPost(store CollectionStore, encode EntityEncoder, decode encoding
 	}
 }
 
-func collectionPut(store CollectionStore, encode EntityEncoder, decode encoding.Decoder, pool *sync.Pool, log log.Logger) http.HandlerFunc {
+func PutResource(store Updatable, encode EntityEncoder, decode encoding.Decoder, pool *sync.Pool, log log.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) { // PUT TODO
-		e := pool.New()
+		e := pool.Get()
 		defer pool.Put(e)
 		if err := decode(r.Body, e); err == nil {
 			if err = store.Update(e); err == nil {
@@ -87,13 +75,11 @@ func collectionPut(store CollectionStore, encode EntityEncoder, decode encoding.
 			}
 		} else {
 			w.WriteHeader(http.StatusBadRequest)
-			encode(w, err)
-
 		}
 	}
 }
 
-func collectionDelete(store CollectionStore, encode EntityEncoder, log log.Logger) http.HandlerFunc {
+func DeleteResource(store Deletable, log log.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) { // DELETE TODO
 		if id := filepath.Base(r.URL.Path); id != "" {
 			if err := store.Delete(id); err == nil {
