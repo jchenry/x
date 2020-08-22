@@ -10,7 +10,7 @@ import (
 )
 
 type CollectionStore interface {
-	All(params url.Values) (interface{}, error)
+	All(params map[string][]string) (interface{}, error)
 	Get(id string) (interface{}, error)
 	Delete(id string) error
 	Update(e interface{}) error
