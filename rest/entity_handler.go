@@ -7,7 +7,7 @@ import (
 )
 
 // EntityHandler returns a handler that provides restful verbs, following a CRUD model
-func EntityHandler(
+func restVerbHandler(
 	get gohttp.Handler,
 	post gohttp.Handler,
 	put gohttp.Handler,
