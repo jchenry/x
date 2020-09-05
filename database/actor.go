@@ -9,7 +9,7 @@ type Func func(db *sql.DB)
 
 type Actor struct {
 	DB         *sql.DB
-	ActionChan <-chan Func
+	ActionChan chan Func
 }
 
 func (a *Actor) Run(ctx context.Context) error {
