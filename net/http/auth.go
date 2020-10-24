@@ -20,7 +20,7 @@ func BasicAuth(h http.Handler, htpasswd map[string]string, realm string) http.Ha
 		user, pass, _ := r.BasicAuth()
 		if pw, ok := htpasswd[user]; !ok || !strings.EqualFold(pass, sha1(pw)) {
 			w.Header().Set("WWW-Authenticate", rlm)
-			http.Error(w, "Unauthorized.", 401)
+			http.Error(w, "Unauthorized", 401)
 			return
 		}
 		h.ServeHTTP(w, r)

@@ -1,6 +1,6 @@
 package log
 
-// Logger is a loggin interface with only the essentials that a function that needs to log should care about. Compatible with  standard Go logger.
+// Logger is a logging interface with only the essentials that a function that needs to log should care about. Compatible with standard Go logger.
 type Logger interface {
 	Print(v ...interface{})
 	Printf(format string, v ...interface{})

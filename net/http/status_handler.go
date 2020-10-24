@@ -11,7 +11,7 @@ type StatusHandler int
 func (s StatusHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	code := int(s)
 	w.WriteHeader(code)
-	io.WriteString(w, http.StatusText(code))
+	_, _ = io.WriteString(w, http.StatusText(code))
 }
 
 var (
