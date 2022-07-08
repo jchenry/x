@@ -15,7 +15,8 @@ func (s StatusHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 var (
-	NotFoundHandler       = StatusHandler(404)
-	NotImplementedHandler = StatusHandler(501)
-	NotLegalHandler       = StatusHandler(451)
+	NotFoundHandler       = StatusHandler(http.StatusNotFound)
+	NotImplementedHandler = StatusHandler(http.StatusNotImplemented)
+	NotLegalHandler       = StatusHandler(http.StatusUnavailableForLegalReasons)
+	NotAllowedHandler     = StatusHandler(http.StatusMethodNotAllowed)
 )

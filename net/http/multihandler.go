@@ -30,7 +30,7 @@ func MutliHandler(h map[string]http.Handler) (http.HandlerFunc, error) {
 		if hdlr, ok := h[r.Method]; ok {
 			hdlr.ServeHTTP(w, r)
 		} else {
-			NotImplementedHandler.ServeHTTP(w, r)
+			NotAllowedHandler.ServeHTTP(w, r)
 		}
 	}, nil
 }
