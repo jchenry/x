@@ -2,14 +2,13 @@ package log
 
 // Logger is a logging interface with only the essentials that a function that needs to log should care about. Compatible with standard Go logger.
 type Logger interface {
-	Print(v ...interface{})
-	Printf(format string, v ...interface{})
-	Println(v ...interface{})
+	Fatal(v ...any)
+	Fatalf(format string, v ...any)
+	Fatalln(v ...any)
+	Panic(v ...any)
+	Panicf(format string, v ...any)
+	Panicln(v ...any)
+	Print(v ...any)
+	Printf(format string, v ...any)
+	Println(v ...any)
 }
-
-// None provides a logger that doesnt log anything
-type None struct{}
-
-func (n None) Print(v ...interface{})                 {}
-func (n None) Printf(format string, v ...interface{}) {}
-func (n None) Println(v ...interface{})               {}
