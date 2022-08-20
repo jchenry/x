@@ -116,11 +116,11 @@ var tests = []struct {
 	},
 	// path params
 	{
-		"/path-param/:id",
+		"/path-param/{id}",
 		"GET", "/path-param/123", true, map[string]string{"id": "123"},
 	},
 	{
-		"/path-params/:era/:group/:member",
+		"/path-params/{era}/{group}/{member}",
 		"GET", "/path-params/60s/beatles/lennon", true, map[string]string{
 			"era":    "60s",
 			"group":  "beatles",
@@ -128,7 +128,7 @@ var tests = []struct {
 		},
 	},
 	{
-		"/path-params-prefix/:era/:group/:member/",
+		"/path-params-prefix/{era}/{group}/{member}/",
 		"GET", "/path-params-prefix/60s/beatles/lennon/yoko", true, map[string]string{
 			"era":    "60s",
 			"group":  "beatles",

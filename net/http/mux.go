@@ -84,9 +84,9 @@ func (r *route) match(ctx context.Context, router *ServeMux, segs []string) (con
 			return nil, false
 		}
 		isParam := false
-		if strings.HasPrefix(seg, ":") {
+		if strings.HasPrefix(seg, "{") {
 			isParam = true
-			seg = strings.TrimPrefix(seg, ":")
+			seg = strings.Trim(seg, "{}")
 		}
 		if !isParam { // verbatim check
 			if strings.HasSuffix(seg, "...") {
