@@ -146,7 +146,7 @@ var tests = []struct {
 	},
 }
 
-func TestWay(t *testing.T) {
+func TestMux(t *testing.T) {
 	for _, test := range tests {
 		r := NewServeMux()
 		match := false

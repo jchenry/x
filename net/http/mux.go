@@ -8,7 +8,7 @@ import (
 
 // wayContextKey is the context key type for storing
 // parameters in context.Context.
-type wayContextKey string
+type contextKey string
 
 // Router routes HTTP requests.
 type ServeMux struct {
@@ -62,7 +62,7 @@ func (r *ServeMux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 // Param gets the path parameter from the specified Context.
 // Returns an empty string if the parameter was not found.
 func Param(ctx context.Context, param string) string {
-	vStr, ok := ctx.Value(wayContextKey(param)).(string)
+	vStr, ok := ctx.Value(contextKey(param)).(string)
 	if !ok {
 		return ""
 	}
@@ -99,7 +99,7 @@ func (r *route) match(ctx context.Context, router *ServeMux, segs []string) (con
 			}
 		}
 		if isParam {
-			ctx = context.WithValue(ctx, wayContextKey(seg), segs[i])
+			ctx = context.WithValue(ctx, contextKey(seg), segs[i])
 		}
 	}
 	return ctx, true
