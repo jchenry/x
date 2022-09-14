@@ -1,3 +1,6 @@
+// based on the "way" package by matt ryer
+// Copyright (c) 2016 Mat Ryer
+
 package http
 
 import (
@@ -6,7 +9,7 @@ import (
 	"strings"
 )
 
-// wayContextKey is the context key type for storing
+// contextKey is the context key type for storing
 // parameters in context.Context.
 type contextKey string
 
