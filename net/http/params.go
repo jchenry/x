@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
 )
 
 func PathParam(ctx context.Context, Param func(ctx context.Context, paramName string) string, p interface{}, paramName string, required bool) (err error) {
@@ -48,52 +47,41 @@ func BodyParam(body io.ReadCloser, p any, v func(p any) error) (err error) {
 }
 
 func mappedParam(m map[string][]string, paramName string, p interface{}, required bool) (err error) {
-	var s string
-	q, exists := m[paramName]
-	if !exists { // intentionally left empty
-	} else if len(q) > 1 {
-		s = strings.Join(q, ",")
-	} else {
-		s = q[0]
-	}
+	s, exists := m[paramName]
 
-	if s == "" && required {
+	if !exists && required {
 		return errors.New("missing required parameter")
 	}
 
 	switch v := p.(type) {
 	case *int64:
-		*v, err = strconv.ParseInt(s, 10, 64)
+		*v, err = strconv.ParseInt(s[0], 10, 64)
 	case *int32:
 		var x int64
-		x, err = strconv.ParseInt(s, 10, 32)
+		x, err = strconv.ParseInt(s[0], 10, 32)
 		*v = int32(x)
 	case *bool:
-		*v, err = strconv.ParseBool(s)
+		*v, err = strconv.ParseBool(s[0])
 	case *string:
-		*v = s
+		*v = s[0]
 	case *[]int64:
-		str := strings.Split(s, ",")
-		for _, s := range str {
-			if e, err := strconv.ParseInt(s, 10, 64); err != nil {
+		for _, i := range s {
+			if e, err := strconv.ParseInt(i, 10, 64); err != nil {
 				return err
 			} else {
 				*v = append(*v, e)
-				// ints[i] = e
 			}
 		}
 	case *[]int32:
-		str := strings.Split(s, ",")
-		for _, s := range str {
-			if e, err := strconv.ParseInt(s, 10, 32); err != nil {
+		for _, i := range s {
+			if e, err := strconv.ParseInt(i, 10, 32); err != nil {
 				return err
 			} else {
 				*v = append(*v, int32(e))
-				// ints[i] = e
 			}
 		}
 	case *[]string:
-		*v = strings.Split(s, ",")
+		*v = s
 	default:
 		err = fmt.Errorf("no match for pointer type %T", v)
 	}
