@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -11,23 +12,28 @@ import (
 	"strings"
 )
 
-func PathParam(ctx context.Context, Param func(ctx context.Context, paramName string) string, paramName string, required bool, dt string) (p any, err error) {
+func PathParam(ctx context.Context, Param func(ctx context.Context, paramName string) string, p interface{}, paramName string, required bool) (err error) {
 	s := Param(ctx, paramName)
 	if s == "" && required {
-		return nil, errors.New("missing required parameter")
+		switch v := p.(type) {
+		case *string:
+			p = v
+			p = nil
+		}
+		return errors.New("missing required parameter")
 	}
 
-	switch dt {
-	case "int64":
-		p, err = strconv.ParseInt(s, 10, 64)
-	case "int32":
+	switch v := p.(type) {
+	case *int64:
+		*v, err = strconv.ParseInt(s, 10, 64)
+	case *int32:
 		var x int64
 		x, err = strconv.ParseInt(s, 10, 32)
-		p = int32(x)
-	case "string":
-		p = s
+		*v = int32(x)
+	case *string:
+		*v = s
 	default:
-		err = errors.New("no match for type")
+		err = fmt.Errorf("no match for pointer type %T", v)
 	}
 
 	return
@@ -41,8 +47,7 @@ func BodyParam(body io.ReadCloser, p any, v func(p any) error) (err error) {
 	return
 }
 
-func mappedParam(m map[string][]string, paramName string, required bool, dt string) (p any, err error) {
-
+func mappedParam(m map[string][]string, paramName string, p interface{}, required bool) (err error) {
 	var s string
 	q, exists := m[paramName]
 	if !exists { // intentionally left empty
@@ -53,60 +58,57 @@ func mappedParam(m map[string][]string, paramName string, required bool, dt stri
 	}
 
 	if s == "" && required {
-		return nil, errors.New("missing required parameter")
+		return errors.New("missing required parameter")
 	}
 
-	switch dt {
-	case "int64":
-		p, err = strconv.ParseInt(s, 10, 64)
-	case "int32":
+	switch v := p.(type) {
+	case *int64:
+		*v, err = strconv.ParseInt(s, 10, 64)
+	case *int32:
 		var x int64
 		x, err = strconv.ParseInt(s, 10, 32)
-		p = int32(x)
-	case "bool":
-		var b bool
-		b, err = strconv.ParseBool(s)
-		p = bool(b)
-	case "string":
-		p = s
-	case "[]int64":
+		*v = int32(x)
+	case *bool:
+		*v, err = strconv.ParseBool(s)
+	case *string:
+		*v = s
+	case *[]int64:
 		str := strings.Split(s, ",")
-		ints := make([]int64, len(str))
-		for i, s := range str {
-			if v, err := strconv.ParseInt(s, 10, 64); err != nil {
-				return nil, err
+		for _, s := range str {
+			if e, err := strconv.ParseInt(s, 10, 64); err != nil {
+				return err
 			} else {
-				ints[i] = v
+				*v = append(*v, e)
+				// ints[i] = e
 			}
 		}
-		p = ints
-	case "[]int32":
+	case *[]int32:
 		str := strings.Split(s, ",")
-		ints := make([]int32, len(str))
-		for i, s := range str {
-			if v, err := strconv.ParseInt(s, 10, 32); err != nil {
-				return nil, err
+		for _, s := range str {
+			if e, err := strconv.ParseInt(s, 10, 32); err != nil {
+				return err
 			} else {
-				ints[i] = int32(v)
+				*v = append(*v, int32(e))
+				// ints[i] = e
 			}
 		}
-		p = ints
-	case "[]string":
-		p = strings.Split(s, ",")
+	case *[]string:
+		*v = strings.Split(s, ",")
 	default:
-		err = errors.New("no match for type")
+		err = fmt.Errorf("no match for pointer type %T", v)
 	}
+
 	return
 }
 
-func QueryParam(query url.Values, paramName string, required bool, dt string) (p any, err error) {
-	return mappedParam(query, paramName, required, dt)
+func QueryParam(query url.Values, paramName string, p interface{}, required bool) (err error) {
+	return mappedParam(query, paramName, p, required)
 }
 
-func HeaderParam(h http.Header, paramName string, required bool, dt string) (p any, err error) {
-	return mappedParam(h, paramName, required, dt)
+func HeaderParam(h http.Header, paramName string, p interface{}, required bool) (err error) {
+	return mappedParam(h, paramName, p, required)
 }
 
-func FormParam(form url.Values, paramName string, required bool, dt string) (p any, err error) {
-	return mappedParam(form, paramName, required, dt)
+func FormParam(form url.Values, paramName string, p interface{}, required bool) (err error) {
+	return mappedParam(form, paramName, p, required)
 }

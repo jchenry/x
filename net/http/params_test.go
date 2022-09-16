@@ -11,246 +11,213 @@ import (
 )
 
 func TestPathParam(t *testing.T) {
-	type args struct {
-		ctx       context.Context
-		Param     func(ctx context.Context, paramName string) string
-		paramName string
-		required  bool
-		dt        string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantP   any
-		wantErr bool
-	}{
-		{
-			name: "test int64 parse",
-			args: args{
-				context.WithValue(context.Background(), contextKey("int64id"), "123"),
-				Param,
-				"int64id",
-				true,
-				"int64",
-			},
-			wantP:   int64(123),
-			wantErr: false,
-		},
-		{
-			name: "test int32 parse",
-			args: args{
-				context.WithValue(context.Background(), contextKey("int32id"), "123"),
-				Param,
-				"int32id",
-				true,
-				"int32",
-			},
-			wantP:   int32(123),
-			wantErr: false,
-		},
-		{
-			name: "test string parse",
-			args: args{
-				context.WithValue(context.Background(), contextKey("stringid"), "foo"),
-				Param,
-				"stringid",
-				true,
-				"string",
-			},
-			wantP:   string("foo"),
-			wantErr: false,
-		},
-		{
-			name: "test missing required parameter",
-			args: args{
-				context.WithValue(context.Background(), contextKey("stringid"), ""),
-				Param,
-				"stringid",
-				true,
-				"string",
-			},
-			wantP:   nil,
-			wantErr: true,
-		},
-		{
-			name: "test unknown type parameter",
-			args: args{
-				context.WithValue(context.Background(), contextKey("stringid"), "foo"),
-				Param,
-				"stringid",
-				true,
-				"not_a_real_type",
-			},
-			wantP:   nil,
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			gotP, err := PathParam(tt.args.ctx, tt.args.Param, tt.args.paramName, tt.args.required, tt.args.dt)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("PathParam() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(gotP, tt.wantP) {
-				t.Errorf("PathParam() = %v, want %v", gotP, tt.wantP)
-			}
-		})
-	}
+	t.Run("test int64 parse", func(t *testing.T) {
+		var p int64
+		err := PathParam(context.WithValue(context.Background(), contextKey("int64id"), "123"), Param, &p, "int64id", true)
+		if (err != nil) != false {
+			t.Errorf("PathParam() error = %v, wantErr %v", err, false)
+			return
+		}
+		if !reflect.DeepEqual(p, int64(123)) {
+			t.Errorf("PathParam() = %v, want %v", p, int64(123))
+		}
+	})
+
+	t.Run("test int32 parse", func(t *testing.T) {
+		var p int32
+		err := PathParam(context.WithValue(context.Background(), contextKey("int32id"), "123"), Param, &p, "int32id", true)
+		if (err != nil) != false {
+			t.Errorf("PathParam() error = %v, wantErr %v", err, false)
+			return
+		}
+		if !reflect.DeepEqual(p, int32(123)) {
+			t.Errorf("PathParam() = %v, want %v", p, int32(123))
+		}
+	})
+
+	t.Run("test string parse", func(t *testing.T) {
+		var p string
+		err := PathParam(
+			context.WithValue(
+				context.Background(),
+				contextKey("stringid"),
+				"foo"),
+			Param,
+			&p,
+			"stringid",
+			true)
+		if (err != nil) != false {
+			t.Errorf("PathParam() error = %v, wantErr %v", err, false)
+			return
+		}
+		if !reflect.DeepEqual(p, "foo") {
+			t.Errorf("PathParam() = %v, want %v", p, "foo")
+		}
+	})
+
+	t.Run("test missing required parameter", func(t *testing.T) {
+		var p string
+		err := PathParam(context.Background(), Param, &p, "stringid", true)
+		if (err != nil) != true {
+			t.Errorf("PathParam() error = %v, wantErr %v", err, true)
+			return
+		}
+		if !reflect.DeepEqual(p, "") {
+			t.Errorf("PathParam() = %v, want %v", p, "")
+		}
+	})
+
+	t.Run("test unknown type parameter", func(t *testing.T) {
+		var p complex64
+		err := PathParam(context.WithValue(context.Background(), contextKey("stringid"), "foo"),
+			Param, p, "stringid", true)
+		if (err != nil) != true {
+			t.Errorf("PathParam() error = %v, wantErr %v", err, true)
+			return
+		}
+		if !reflect.DeepEqual(p, complex64(0)) {
+			t.Errorf("PathParam() = %v, want %v", p, complex64(0))
+		}
+	})
 }
 
 func toValues(s string) url.Values {
 	v, _ := url.ParseQuery(s)
 	return v
 }
-func TestMappedParam(t *testing.T) {
 
-	type args struct {
-		query     url.Values
-		paramName string
-		required  bool
-		dt        string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantP   any
-		wantErr bool
-	}{
-		{
-			name: "test int64 parse",
-			args: args{
-				toValues("x=123"),
-				"x",
-				true,
-				"int64",
-			},
-			wantP:   int64(123),
-			wantErr: false,
-		},
-		{
-			name: "test int32 parse",
-			args: args{
-				toValues("x=123"),
-				"x",
-				true,
-				"int32",
-			},
-			wantP:   int32(123),
-			wantErr: false,
-		},
-		{
-			name: "test bool parse",
-			args: args{
-				toValues("x=true"),
-				"x",
-				true,
-				"bool",
-			},
-			wantP:   bool(true),
-			wantErr: false,
-		},
-		{
-			name: "test string parse",
-			args: args{
-				toValues("x=foobar"),
-				"x",
-				true,
-				"string",
-			},
-			wantP:   string("foobar"),
-			wantErr: false,
-		},
-		{
-			name: "test []int64 parse",
-			args: args{
-				toValues("x=123&x=456"),
-				"x",
-				true,
-				"[]int64",
-			},
-			wantP:   []int64{int64(123), int64(456)},
-			wantErr: false,
-		},
-		{
-			name: "test []int64 bad parse",
-			args: args{
-				toValues("x=123&x=4q56"),
-				"x",
-				true,
-				"[]int64",
-			},
-			wantP:   nil,
-			wantErr: true,
-		},
-		{
-			name: "test []int32 parse",
-			args: args{
-				toValues("x=123&x=456"),
-				"x",
-				true,
-				"[]int32",
-			},
-			wantP:   []int32{int32(123), int32(456)},
-			wantErr: false,
-		},
-		{
-			name: "test []int32 bad parse",
-			args: args{
-				toValues("x=123&x=4q56"),
-				"x",
-				true,
-				"[]int32",
-			},
-			wantP:   nil,
-			wantErr: true,
-		},
-		{
-			name: "test []string parse",
-			args: args{
-				toValues("x=foo&x=bar"),
-				"x",
-				true,
-				"[]string",
-			},
-			wantP:   []string{"foo", "bar"},
-			wantErr: false,
-		},
-		{
-			name: "test missing required parameter",
-			args: args{
-				toValues("y=hello"),
-				"x",
-				true,
-				"string",
-			},
-			wantP:   nil,
-			wantErr: true,
-		},
-		{
-			name: "test unknown type parameter",
-			args: args{
-				toValues("x=hello"),
-				"x",
-				true,
-				"not_a_real_type",
-			},
-			wantP:   nil,
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			gotP, err := mappedParam(tt.args.query, tt.args.paramName, tt.args.required, tt.args.dt)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("QueryParam() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(gotP, tt.wantP) {
-				t.Errorf("QueryParam() = %v, want %v", gotP, tt.wantP)
-			}
-		})
-	}
+func TestMappedParam(t *testing.T) {
+	t.Run("test int64 parse", func(t *testing.T) {
+		var p int64
+		err := mappedParam(toValues("x=123"), "x", &p, true)
+		if (err != nil) != false {
+			t.Errorf("QueryParam() error = %v, wantErr %v", err, false)
+			return
+		}
+		if !reflect.DeepEqual(p, int64(123)) {
+			t.Errorf("QueryParam() = %v, want %v", p, int64(123))
+		}
+	})
+
+	t.Run("test int32 parse", func(t *testing.T) {
+		var p int32
+		err := mappedParam(toValues("x=123"), "x", &p, true)
+		if (err != nil) != false {
+			t.Errorf("QueryParam() error = %v, wantErr %v", err, false)
+			return
+		}
+		if !reflect.DeepEqual(p, int32(123)) {
+			t.Errorf("QueryParam() = %v, want %v", p, int32(123))
+		}
+	})
+
+	t.Run("test bool parse", func(t *testing.T) {
+		var p bool
+		err := mappedParam(toValues("x=true"), "x", &p, true)
+		if (err != nil) != false {
+			t.Errorf("QueryParam() error = %v, wantErr %v", err, false)
+			return
+		}
+		if !reflect.DeepEqual(p, true) {
+			t.Errorf("QueryParam() = %v, want %v", p, true)
+		}
+	})
+
+	t.Run("test string parse", func(t *testing.T) {
+		var p string
+		err := mappedParam(toValues("x=foobar"), "x", &p, true)
+		if (err != nil) != false {
+			t.Errorf("QueryParam() error = %v, wantErr %v", err, false)
+			return
+		}
+		if !reflect.DeepEqual(p, "foobar") {
+			t.Errorf("QueryParam() = %v, want %v", p, "foobar")
+		}
+	})
+
+	t.Run("test []int64 parse", func(t *testing.T) {
+		var p []int64
+		err := mappedParam(toValues("x=123&x=456"), "x", &p, true)
+		if (err != nil) != false {
+			t.Errorf("QueryParam() error = %v, wantErr %v", err, false)
+			return
+		}
+		if !reflect.DeepEqual(p, []int64{int64(123), int64(456)}) {
+			t.Errorf("QueryParam() = %v, want %v", p, []int64{int64(123), int64(456)})
+		}
+	})
+
+	t.Run("test []int64 bad parse", func(t *testing.T) {
+		var p []int64
+		err := mappedParam(toValues("x=123&x=4q56"), "x", &p, true)
+		if (err != nil) != true {
+			t.Errorf("QueryParam() error = %v, wantErr %v", err, true)
+			return
+		}
+		if !reflect.DeepEqual(p, []int64{123}) {
+			t.Errorf("QueryParam() = %v, want %v", p, []int64{})
+		}
+	})
+
+	t.Run("test []int32 parse", func(t *testing.T) {
+		var p []int32
+		err := mappedParam(toValues("x=123&x=456"), "x", &p, true)
+		if (err != nil) != false {
+			t.Errorf("QueryParam() error = %v, wantErr %v", err, false)
+			return
+		}
+		if !reflect.DeepEqual(p, []int32{int32(123), int32(456)}) {
+			t.Errorf("QueryParam() = %v, want %v", p, []int32{int32(123), int32(456)})
+		}
+	})
+
+	t.Run("test []int32 bad parse", func(t *testing.T) {
+		var p []int32
+		err := mappedParam(toValues("x=123&x=4q56"), "x", &p, true)
+		if (err != nil) != true {
+			t.Errorf("QueryParam() error = %v, wantErr %v", err, true)
+			return
+		}
+		if !reflect.DeepEqual(p, []int32{123}) {
+			t.Errorf("QueryParam() = %v, want %v", p, []int32{123})
+		}
+	})
+
+	t.Run("test []string parse", func(t *testing.T) {
+		var p []string
+		err := mappedParam(toValues("x=foo&x=bar"), "x", &p, true)
+		if (err != nil) != false {
+			t.Errorf("QueryParam() error = %v, wantErr %v", err, false)
+			return
+		}
+		if !reflect.DeepEqual(p, []string{"foo", "bar"}) {
+			t.Errorf("QueryParam() = %v, want %v", p, []string{"foo", "bar"})
+		}
+	})
+
+	t.Run("test missing required parameter", func(t *testing.T) {
+		var p string
+		err := mappedParam(toValues("y=hello"), "x", &p, true)
+		if (err != nil) != true {
+			t.Errorf("QueryParam() error = %v, wantErr %v", err, true)
+			return
+		}
+		if !reflect.DeepEqual(p, "") {
+			t.Errorf("QueryParam() = %v, want %v", p, "")
+		}
+	})
+
+	t.Run("test unknown type parameter", func(t *testing.T) {
+		var p complex64
+		err := mappedParam(toValues("x=hello"), "x", &p, true)
+		if (err != nil) != true {
+			t.Errorf("QueryParam() error = %v, wantErr %v", err, true)
+			return
+		}
+		if !reflect.DeepEqual(p, complex64(0)) {
+			t.Errorf("QueryParam() = %v, want %v", p, complex64(0))
+		}
+	})
 }
 
 func TestBodyParam(t *testing.T) {
@@ -309,4 +276,12 @@ func TestBodyParam(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Ptr[T any](v T) *T {
+	return &v
+}
+
+func NilString() *string {
+	return nil
 }
