@@ -1,7 +1,7 @@
 package log
 
 // Logger is a logging interface with only the essentials that a function that needs to log should care about. Compatible with standard Go logger.
-type Logger interface {
+type Interface interface {
 	Fatal(v ...any)
 	Fatalf(format string, v ...any)
 	Fatalln(v ...any)

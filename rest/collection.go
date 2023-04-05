@@ -11,7 +11,7 @@ import (
 )
 
 // Example: Resource(p, c, JSONEncoder, json.Decode(func()interface{}{return &foo{}}), log.None{})
-func Resource(p *sync.Pool, g Gateway, e EntityEncoder, d encoding.Decoder, l log.Logger) http.HandlerFunc {
+func Resource(p *sync.Pool, g Gateway, e EntityEncoder, d encoding.Decoder, l log.Interface) http.HandlerFunc {
 	return restVerbHandler(
 		GetResource(g, e, l),
 		PostResource(g, d, p, l),
@@ -20,7 +20,7 @@ func Resource(p *sync.Pool, g Gateway, e EntityEncoder, d encoding.Decoder, l lo
 	)
 }
 
-func GetResource(store Readable, encode EntityEncoder, log log.Logger) http.HandlerFunc {
+func GetResource(store Readable, encode EntityEncoder, log log.Interface) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) { // GET
 		if id := filepath.Base(r.URL.Path); id != "" {
 			if e, err := store.Read(id); err == nil { // handle individual entity
@@ -44,7 +44,7 @@ func GetResource(store Readable, encode EntityEncoder, log log.Logger) http.Hand
 	}
 }
 
-func PostResource(store Creatable, decode encoding.Decoder, pool *sync.Pool, log log.Logger) http.HandlerFunc {
+func PostResource(store Creatable, decode encoding.Decoder, pool *sync.Pool, log log.Interface) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) { // POST TODO
 		e := pool.Get()
 		defer pool.Put(e)
@@ -61,7 +61,7 @@ func PostResource(store Creatable, decode encoding.Decoder, pool *sync.Pool, log
 	}
 }
 
-func PutResource(store Updatable, encode EntityEncoder, decode encoding.Decoder, pool *sync.Pool, log log.Logger) http.HandlerFunc {
+func PutResource(store Updatable, encode EntityEncoder, decode encoding.Decoder, pool *sync.Pool, log log.Interface) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) { // PUT TODO
 		e := pool.Get()
 		defer pool.Put(e)
@@ -79,7 +79,7 @@ func PutResource(store Updatable, encode EntityEncoder, decode encoding.Decoder,
 	}
 }
 
-func DeleteResource(store Deletable, log log.Logger) http.HandlerFunc {
+func DeleteResource(store Deletable, log log.Interface) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) { // DELETE TODO
 		if id := filepath.Base(r.URL.Path); id != "" {
 			if err := store.Delete(id); err == nil {
